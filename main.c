@@ -20,8 +20,14 @@
 #define		COMM_ACK_COM		0x03
 #define		COMM_ACK_DATA		0x04
 
+#ifdef prog_uint16_t
 static prog_uint16_t prog_baud=0x67;
 static prog_uint8_t prog_parity=0x00;
+#else
+static __flash const uint16_t prog_baud=0x67;
+static __flash const uint8_t prog_parity=0x00;
+#endif
+
 static uint16_t eeprom_baud EEMEM=0x67;
 static uint8_t eeprom_parity EEMEM=0x00;
 
@@ -108,9 +114,6 @@ uint16_t GetBaud(void)
 			{
 				TCCR1B&=~_BV(ICES1);
 				TCNT1=0;
-				//tmp=ICR1H;
-				//tmp<<=8;
-				//tmp|=ICR1L;
 				tmp=ICR1;
 				cntbuf[index++]=tmp;
 				st=0;
@@ -119,9 +122,6 @@ uint16_t GetBaud(void)
 			}
 			else 
 			{
-				//tmp=ICR1H;
-				//tmp<<=8;
-				//tmp|=ICR1L;
 				tmp=ICR1;
 				cntbuf[index++]=tmp;
 				st++;
@@ -223,7 +223,6 @@ int main(void)
 	}
 	wdt_reset();
 	TCCR1B=_BV(ICNC1)|_BV(CS11);
-//	baud=GetBaud();
 	baud=0;
 	TCCR1B&=~(_BV(ICES1)|_BV(ICNC1)|_BV(CS11));
 	if(baud)
@@ -345,20 +344,14 @@ int main(void)
 		UCSRB =_BV(RXEN)|_BV(TXEN);
 	}
 	DispTestEnd();
-	DispDigits("P   ");
-//	DispDigits("1.234");
+	DispDigits((uint8_t*)"P   ");
 	parity=COMM_STA_IDL;
 	chksum=0;
 	i=0;
 	uart_setbyte(0x55);
-//	baud=Qequation(24852,34110,2453);
-//	DispDigits(NumberStr(rxbuf,baud));
-//	DispDigits("  4.50");
-//	DispDigit(0x35,2);
 	while(1)
 	{
 		wdt_reset();
-//		uart_setbyte(0x55);
 		if(UCSRA&_BV(RXC))
 		{
 			err=UDR;
@@ -408,7 +401,7 @@ int main(void)
 					err=rxbuf[0];
 					if(err==COMM_CMD_OV)
 					{
-						DispDigits("1     ");
+						DispDigits((uint8_t*)"1     ");
 						SendAck(COMM_ACK_OK,id);
 					}
 					else if(err==COMM_CMD_DATA)
@@ -418,7 +411,7 @@ int main(void)
 					}
 					else if(err==COMM_CMD_ZERO)
 					{
-						DispDigits("0.");
+						DispDigits((uint8_t*)"0.");
 						SendAck(COMM_ACK_OK,id);
 					}
 					else if(err==COMM_CMD_TESTON)
@@ -438,7 +431,7 @@ int main(void)
 				}
 				else
 				{
-					DispDigits("-----");
+					DispDigits((uint8_t*)"-----");
 					SendAck(COMM_ACK_CHK,id);
 				}
 				i=0;

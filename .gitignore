@@ -30,3 +30,17 @@
 
 # Debug files
 *.dSYM/
+
+#dependencies
+.dep/
+*.d
+
+#Listing files
+*.lst
+*.lss
+*.map
+*.sym
+
+#Intel Hex files
+*.eep
+
