@@ -44,3 +44,6 @@
 #Intel Hex files
 *.eep
 
+.DS_Store
+doc/
+
